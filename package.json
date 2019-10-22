@@ -1,10 +1,21 @@
 {
 	"name": "ocaml-formatter",
 	"displayName": "OCaml Formatter",
-	"description": "Formatter for ocaml language",
+	"description": "Formatter for OCaml language",
 	"version": "0.1.0",
 	"license": "Apache-2.0",
 	"publisher": "badochov",
+	"icon": "assets/logo.png",
+	"categories": [
+		"Formatters"
+	],
+	"keywords": [
+		"ocaml",
+		"format",
+		"formatting",
+		"formatter",
+		"merlin"
+	],
 	"bugs": {
 		"url": "https://github.com/badochov/ocamlformatter-vscode/issues"
 	},
@@ -15,9 +26,6 @@
 	"engines": {
 		"vscode": "^1.39.0"
 	},
-	"categories": [
-		"Formatters"
-	],
 	"activationEvents": [
 		"onLanguage:ocaml"
 	],
