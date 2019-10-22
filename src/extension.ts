@@ -17,6 +17,20 @@ function callOcamlFormatCommand(filePath: string, profile: string): any {
 	return out;
 }
 
+function createTempFile(content: string, path: string) {
+	let out = { success: false, error: "" };
+	const sanitizedContent = content.replace(/"/g, '\\"');
+	try {
+		execSync(`echo "${sanitizedContent}" > ${path}`).toString();
+		out.success = true;
+	}
+	catch (error) {
+		out.error = error.toString();
+		console.log(error);
+	}
+	return out;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -26,7 +40,14 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	vscode.languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'ocaml' }, {
 		provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-			const filePath = document.uri.fsPath;
+			const filePath = "badochov.ocaml-formatter.temp.txt";
+			// const filePath = document.uri.fsPath;
+			const writeTempFileOut = createTempFile(document.getText(), filePath);
+
+			if (writeTempFileOut.success === false) {
+				vscode.window.showErrorMessage(writeTempFileOut.error);
+				return [vscode.TextEdit.insert(document.positionAt(0), "")];
+			}
 
 			const settings = vscode.workspace.getConfiguration('ocaml-formatter');
 			console.log(settings);
@@ -44,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 
 			if (ocamlFormatResponse.error !== null) {
-				vscode.window.showInformationMessage(ocamlFormatResponse.error);
+				vscode.window.showErrorMessage(ocamlFormatResponse.error);
 				return [vscode.TextEdit.insert(document.positionAt(0), "")];
 			}
 			return [vscode.TextEdit.replace(fullRange, ocamlFormatResponse.formattedText)];
