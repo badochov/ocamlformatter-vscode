@@ -9,12 +9,6 @@ Formats your ocaml code
 ## Requirements
 
 Install ocamlformat (https://github.com/ocaml-ppx/ocamlformat).
-Add this line to settings (JSON)
-	
-"files.associations": {
-	"*.ml": "ocaml",
-	"*.mli": "ocaml"
-}
 
 ## Extension Settings
 

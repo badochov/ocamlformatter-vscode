@@ -31,6 +31,15 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"languages": [
+			{
+				"id": "ocaml",
+				"extensions": [
+					".ml",
+					".mli"
+				]
+			}
+		],
 		"configuration": {
 			"title": "OCaml Formatter",
 			"properties": {
