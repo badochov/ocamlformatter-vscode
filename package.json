@@ -3,6 +3,15 @@
 	"displayName": "OCaml Formatter",
 	"description": "Formatter for ocaml language",
 	"version": "0.0.1",
+	"license": "Apache-2.0",
+	"publisher": "badochov",
+	"bugs": {
+		"url": "https://github.com/badochov/ocamlformatter-vscode/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/badochov/ocamlformatter-vscode.git"
+	},
 	"engines": {
 		"vscode": "^1.39.0"
 	},
@@ -10,27 +19,27 @@
 		"Formatters"
 	],
 	"activationEvents": [
-		"onCommand:extension.formatOCaml"
+		"onLanguage:ocaml"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "extension.formatOCaml",
-				"title": "Hello World Ocaml"
-			}
-		],
 		"configuration": {
 			"title": "OCaml Formatter",
 			"properties": {
-			  "ocaml-formatter.profile": {
-				"type": "string",
-				"default": "conventional",
-				"enum": ["conventional", "janestreet","sparse", "compact", "ocamlformat"],
-				"description": "Choose formatting profile"
-			  }
+				"ocaml-formatter.profile": {
+					"type": "string",
+					"default": "conventional",
+					"enum": [
+						"conventional",
+						"janestreet",
+						"sparse",
+						"compact",
+						"ocamlformat"
+					],
+					"description": "Choose formatting profile"
+				}
 			}
-		  }
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
