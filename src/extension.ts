@@ -5,14 +5,23 @@
 import * as vscode from 'vscode';
 
 const { execSync } = require('child_process');
-
+const profiles = [
+	"conventional",
+	"janestreet",
+	"sparse",
+	"compact",
+	"ocamlformat",
+	"own"
+];
 
 function callOcamlFormatCommand(filePath: string, profile: string, dir: string): any {
 	const out = { formattedText: "", error: null };
 	try {
 		let profileString = '';
-		if (profile !== "own") {
-			profileString = `--profile=${profile}`;
+		if (profiles.includes(profile)) {
+			if (profile !== "own") {
+				profileString = `--profile=${profile}`;
+			}
 		}
 		out.formattedText = execSync(`cd ${dir} && ocamlformat --enable-outside-detected-project ${profileString} ${filePath}`).toString();
 	}

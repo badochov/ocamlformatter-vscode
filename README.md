@@ -4,7 +4,9 @@ This extension doesn't provide ocaml support in vscode, install one of available
 
 ## Features
 
-Formats your ocaml code
+Formats your ocaml code.
+You can add your own formatting guidlines by either choosing one of preset profiles or making your own.
+To make your own profile choose profile "own" and add formatting guidelines in .ocamlformat file in project's root as defined in ocamlformat docs. 
 
 ## Requirements
 
