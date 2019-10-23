@@ -14,31 +14,17 @@ const profiles = [
 	"own"
 ];
 
-function callOcamlFormatCommand(filePath: string, profile: string, dir: string): any {
+function callOcamlFormatCommand(content: string, fileName: string, dir: string, profile: string): any {
 	const out = { formattedText: "", error: null };
 	try {
+		const sanitizedContent = content.replace(/"/g, '\\"');
 		let profileString = '';
 		if (profiles.includes(profile)) {
 			if (profile !== "own") {
 				profileString = `--profile=${profile}`;
 			}
 		}
-		out.formattedText = execSync(`cd ${dir} && ocamlformat --enable-outside-detected-project ${profileString} ${filePath}`).toString();
-	}
-	catch (error) {
-		out.error = error.toString();
-		console.log(error);
-	}
-	return out;
-}
-
-function createTempFile(content: string, path: string) {
-	let out = { success: false, error: "" };
-	const sanitizedContent = content.replace(/"/g, '\\"');
-	try {
-		console.log(path);
-		execSync(`echo "${sanitizedContent}" > ${path}`);
-		out.success = true;
+		out.formattedText = execSync(`cd ${dir} && echo "${sanitizedContent}" | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`).toString();
 	}
 	catch (error) {
 		out.error = error.toString();
@@ -60,10 +46,10 @@ function getFileDir(path: string) {
 	return out;
 }
 
-function removeTempFile(path: string) {
-	let out = { success: false, error: "" };
+function getFileName(path: string) {
+	let out = { success: false, error: "", path: "" };
 	try {
-		execSync(`rm "${path}"`);
+		out.path = execSync(`basename "${path}"`).toString().split('\n')[0];
 		out.success = true;
 	}
 	catch (error) {
@@ -82,9 +68,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	vscode.languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'ocaml' }, {
 		provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
+			const fullPath = document.uri.fsPath;
 
-
-			const dirObj = getFileDir(document.uri.fsPath);
+			const dirObj = getFileDir(fullPath);
 
 			if (dirObj.success === false) {
 				vscode.window.showErrorMessage(dirObj.error);
@@ -92,25 +78,20 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			const dir = dirObj.path;
 
-			const tempFilePath = `${dir}/badochov.ocaml-formatter.temp.txt`;
+			const fileNameObj = getFileName(document.uri.fsPath);
 
-			// const filePath = document.uri.fsPath;
-			const writeTempFileOut = createTempFile(document.getText(), tempFilePath);
-
-			if (writeTempFileOut.success === false) {
-				vscode.window.showErrorMessage(writeTempFileOut.error);
+			if (fileNameObj.success === false) {
+				vscode.window.showErrorMessage(fileNameObj.error);
 				return [vscode.TextEdit.insert(document.positionAt(0), "")];
 			}
+			const fileName = fileNameObj.path;
 
 			const settings = vscode.workspace.getConfiguration('ocaml-formatter');
-			console.log(settings);
 			const profile = settings.get("profile");
 
-			const ocamlFormatResponse = callOcamlFormatCommand(tempFilePath, <string>profile, dir);
-
-			console.log(ocamlFormatResponse);
-
 			const fullText = document.getText();
+
+			const ocamlFormatResponse = callOcamlFormatCommand(fullText, fileName, dir, <string>profile);
 
 			const fullRange = new vscode.Range(
 				document.positionAt(0),
@@ -120,12 +101,6 @@ export function activate(context: vscode.ExtensionContext) {
 			if (ocamlFormatResponse.error !== null) {
 				vscode.window.showErrorMessage(ocamlFormatResponse.error);
 				return [vscode.TextEdit.insert(document.positionAt(0), "")];
-			}
-
-			const removed = removeTempFile(tempFilePath);
-
-			if (removed.success !== true) {
-				vscode.window.showErrorMessage(removed.error);
 			}
 
 			return [vscode.TextEdit.replace(fullRange, ocamlFormatResponse.formattedText)];
