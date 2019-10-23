@@ -51,9 +51,10 @@
 						"janestreet",
 						"sparse",
 						"compact",
-						"ocamlformat"
+						"ocamlformat",
+						"own"
 					],
-					"description": "Choose formatting profile"
+					"description": "Choose formatting profile (own is one defined in .ocamlformat file in project's root directory (see ocamlformat for definition))"
 				}
 			}
 		}
