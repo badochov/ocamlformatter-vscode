@@ -2,7 +2,7 @@
 	"name": "ocaml-formatter",
 	"displayName": "OCaml Formatter",
 	"description": "Formatter for OCaml language",
-	"version": "0.7.0",
+	"version": "1.0.0",
 	"license": "Apache-2.0",
 	"publisher": "badochov",
 	"icon": "assets/logo.png",
@@ -31,6 +31,21 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"commands": [
+			{
+				"command": "ocaml-formatter.runCodeFragment",
+				"title": "Run code fragment in interactive console"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "resourceLangId == ocaml",
+					"command": "ocaml-formatter.runCodeFragment",
+					"group": "OcamlFormatter@1"
+				}
+			]
+		},
 		"languages": [
 			{
 				"id": "ocaml",
