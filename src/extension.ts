@@ -42,7 +42,8 @@ function getTextForExecution(content: string, fileName: string = "ocaml-code") {
 	}
 
 	const formattedText = ocamlFormatResponse.text + "\n";
-	const preparedText = formattedText.replace(/\n\n/g, ";;\n");
+	const noCommentsText = formattedText.replace(/\(\*(.|\n|\r)*?\*\)/g, "");
+	const preparedText = noCommentsText.replace(/\n\n/g, ";;\n");
 	const sanitizedText = preparedText.replace(/\"/g, "\\\"");
 	return sanitizedText;
 }
