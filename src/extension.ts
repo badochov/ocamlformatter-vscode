@@ -14,6 +14,10 @@ const profiles = [
 	"own"
 ];
 
+function escapeSpaces(string: string) {
+	return string.replace(/(?= )/g, "\\");
+}
+
 function callOcamlFormatCommand(content: string, fileName: string, dir: string, profile: string): any {
 	const out = { text: "", error: null };
 	try {
@@ -24,6 +28,7 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 				profileString = `--profile=${profile}`;
 			}
 		}
+		console.error(`cd ${dir} && echo "${sanitizedContent}" | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`);
 		out.text = execSync(`cd ${dir} && echo "${sanitizedContent}" | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`).toString();
 	}
 	catch (error) {
@@ -35,23 +40,39 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 
 
 function getTextForExecution(content: string, fileName: string = "ocaml-code") {
-	const ocamlFormatResponse = callOcamlFormatCommand(content, fileName, ".", "ocamlformat");
-	if (ocamlFormatResponse.error !== null) {
-		vscode.window.showErrorMessage(ocamlFormatResponse.error);
-		throw new Error("Formatting error exception");
-	}
 
-	const formattedText = ocamlFormatResponse.text + "\n";
+	const useRegex = /#use ".*?"(?= *(?:;;)?)/g;
+	const uses = content.match(useRegex);
+	const usesArray = uses ? uses : [];
+	console.log(content);
+	let output = "";
+	const splitByUseContent = content.split(useRegex);
+	console.log(splitByUseContent);
+	for (const [i, part] of Object.entries(splitByUseContent)) {
+		const ocamlFormatResponse = callOcamlFormatCommand(part, fileName, ".", "ocamlformat");
+		if (ocamlFormatResponse.error !== null) {
+			vscode.window.showErrorMessage(ocamlFormatResponse.error);
+			throw new Error("Formatting error exception");
+		}
+		output += ocamlFormatResponse.text;
+		if (usesArray[parseInt(i)] !== undefined) {
+			output += usesArray[parseInt(i)] + "\n\n";
+		}
+	}
+	const formattedText = output + ";;";
+	console.log(formattedText);
 	const noCommentsText = formattedText.replace(/\(\*(.|\n|\r)*?\*\)/g, "");
-	const preparedText = noCommentsText.replace(/\n\n/g, ";;\n");
+	const preparedText = noCommentsText.replace(/\nlet/g, ";;\nlet");
 	const sanitizedText = preparedText.replace(/\"/g, "\\\"");
-	return sanitizedText;
+	const escapePercentageSign = sanitizedText.replace(/%/g, "%%");
+	console.log(escapePercentageSign);
+	return escapePercentageSign;
 }
 
 function getFileDir(path: string) {
 	let out = { success: false, error: "", path: "" };
 	try {
-		out.path = execSync(`dirname ${path}`).toString().split('\n')[0];
+		out.path = escapeSpaces(execSync(`dirname ${path}`).toString().split('\n')[0]);
 		out.success = true;
 	}
 	catch (error) {
@@ -64,7 +85,7 @@ function getFileDir(path: string) {
 function getFileName(path: string) {
 	let out = { success: false, error: "", path: "" };
 	try {
-		out.path = execSync(`basename "${path}"`).toString().split('\n')[0];
+		out.path = escapeSpaces(execSync(`basename "${path}"`).toString().split('\n')[0]);
 		out.success = true;
 	}
 	catch (error) {
@@ -82,9 +103,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	vscode.languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'ocaml' }, {
 		provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-			const fullPath = document.uri.fsPath;
+			const filePath = escapeSpaces(document.uri.fsPath);
 
-			const dirObj = getFileDir(fullPath);
+			const dirObj = getFileDir(filePath);
 
 			if (dirObj.success === false) {
 				vscode.window.showErrorMessage(dirObj.error);
@@ -92,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			const dir = dirObj.path;
 
-			const fileNameObj = getFileName(document.uri.fsPath);
+			const fileNameObj = getFileName(filePath);
 
 			if (fileNameObj.success === false) {
 				vscode.window.showErrorMessage(fileNameObj.error);
@@ -133,6 +154,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 				const terminal = vscode.window.createTerminal("OCaml ");
 				terminal.show();
+				// terminal.sendText(`printf "${ocamlScript}"`);
+
 				terminal.sendText(`(printf "${ocamlScript}"; rlwrap cat) | ocaml`);
 			}
 			catch (e) {
@@ -148,3 +171,4 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
+
