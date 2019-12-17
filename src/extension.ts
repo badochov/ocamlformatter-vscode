@@ -38,6 +38,13 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 	return out;
 }
 
+function formatOcamlFormatterError(error: string) {
+	const formatted = error.replace(/(\n|\r|.)*--enable-outside-detected-project .*? -/g, "");
+	console.log(formatted);
+	console.log("eluwina");
+	return formatted;
+}
+
 
 function getTextForExecution(content: string, fileName: string = "ocaml-code") {
 
@@ -134,7 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 
 			if (ocamlFormatResponse.error !== null) {
-				vscode.window.showErrorMessage(ocamlFormatResponse.error);
+				vscode.window.showErrorMessage(formatOcamlFormatterError(ocamlFormatResponse.error));
 				return [vscode.TextEdit.insert(document.positionAt(0), "")];
 			}
 
