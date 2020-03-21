@@ -21,15 +21,15 @@ function escapeSpaces(string: string) {
 function callOcamlFormatCommand(content: string, fileName: string, dir: string, profile: string): any {
 	const out = { text: "", error: null };
 	try {
-		const sanitizedContent = content.replace(/"/g, '\\"');
+		const sanitizedContent = content.replace(/'/g, "'\\''");
 		let profileString = '';
 		if (profiles.includes(profile)) {
 			if (profile !== "own") {
 				profileString = `--profile=${profile}`;
 			}
 		}
-		console.error(`cd ${dir} && echo "${sanitizedContent}" | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`);
-		out.text = execSync(`cd ${dir} && echo "${sanitizedContent}" | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`).toString();
+		console.error(`cd ${dir} && echo '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`);
+		out.text = execSync(`cd ${dir} && echo '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`).toString();
 	}
 	catch (error) {
 		out.error = error.toString();
