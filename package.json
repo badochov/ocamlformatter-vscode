@@ -24,7 +24,7 @@
 		"url": "https://github.com/badochov/ocamlformatter-vscode.git"
 	},
 	"engines": {
-		"vscode": "^1.39.0"
+		"vscode": "^1.43.0"
 	},
 	"activationEvents": [
 		"onLanguage:ocaml"
