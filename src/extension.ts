@@ -28,8 +28,9 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 				profileString = `--profile=${profile}`;
 			}
 		}
-		console.error(`cd ${dir} && echo '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`);
-		out.text = execSync(`cd ${dir} && echo '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`).toString();
+		const command = `cd ${dir} && printf '%s' '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`;
+		console.error('%s', command);
+		out.text = execSync(command).toString();
 	}
 	catch (error) {
 		out.error = error.toString();
