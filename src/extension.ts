@@ -14,10 +14,6 @@ const profiles = [
 	"own"
 ];
 
-function escapeSpaces(string: string) {
-	return string.replace(/(?= )/g, "\\");
-}
-
 function callOcamlFormatCommand(content: string, fileName: string, dir: string, profile: string): any {
 	const out = { text: "", error: null };
 	try {
@@ -28,7 +24,7 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 				profileString = `--profile=${profile}`;
 			}
 		}
-		const command = `cd ${dir} && printf '%s' '${sanitizedContent}' | ocamlformat --name=${fileName} --enable-outside-detected-project ${profileString} -`;
+		const command = `cd '${dir}' && printf '%s' '${sanitizedContent}' | ocamlformat --name='${fileName}' --enable-outside-detected-project '${profileString}' -`;
 		console.error('%s', command);
 		out.text = execSync(command).toString();
 	}
@@ -42,12 +38,11 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 function formatOcamlFormatterError(error: string) {
 	const formatted = error.replace(/(\n|\r|.)*--enable-outside-detected-project .*? -/g, "");
 	console.log(formatted);
-	console.log("eluwina");
 	return formatted;
 }
 
 
-function getTextForExecution(content: string, fileName: string = "ocaml-code") {
+function getTextForExecution(content: string, fileName: string = "ocaml-code.ml") {
 
 	const useRegex = /#use ".*?"(?= *(?:;;)?)/g;
 	const uses = content.match(useRegex);
@@ -68,19 +63,17 @@ function getTextForExecution(content: string, fileName: string = "ocaml-code") {
 		}
 	}
 	const formattedText = output + ";;";
-	console.log(formattedText);
 	const noCommentsText = formattedText.replace(/\(\*(.|\n|\r)*?\*\)/g, "");
 	const preparedText = noCommentsText.replace(/\nlet/g, ";;\nlet");
 	const sanitizedText = preparedText.replace(/\"/g, "\\\"");
 	const escapePercentageSign = sanitizedText.replace(/%/g, "%%");
-	console.log(escapePercentageSign);
 	return escapePercentageSign;
 }
 
 function getFileDir(path: string) {
 	let out = { success: false, error: "", path: "" };
 	try {
-		out.path = escapeSpaces(execSync(`dirname ${path}`).toString().split('\n')[0]);
+		out.path = execSync(`dirname '${path}'`).toString().split('\n')[0];
 		out.success = true;
 	}
 	catch (error) {
@@ -93,7 +86,7 @@ function getFileDir(path: string) {
 function getFileName(path: string) {
 	let out = { success: false, error: "", path: "" };
 	try {
-		out.path = escapeSpaces(execSync(`basename "${path}"`).toString().split('\n')[0]);
+		out.path = execSync(`basename '${path}'`).toString().split('\n')[0];
 		out.success = true;
 	}
 	catch (error) {
@@ -111,7 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	vscode.languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'ocaml' }, {
 		provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-			const filePath = escapeSpaces(document.uri.fsPath);
+			const filePath = document.uri.fsPath;
 
 			const dirObj = getFileDir(filePath);
 
@@ -160,11 +153,12 @@ export function activate(context: vscode.ExtensionContext) {
 			try {
 				let ocamlScript = getTextForExecution(selectedText);
 
-				const terminal = vscode.window.createTerminal("OCaml ");
+				const terminal = vscode.window.createTerminal("OCaml");
 				terminal.show();
 				// terminal.sendText(`printf "${ocamlScript}"`);
 
-				terminal.sendText(`(printf "${ocamlScript}"; rlwrap cat) | ocaml`);
+				terminal.sendText(`/bin/bash`);
+				terminal.sendText(`(printf '${ocamlScript}'; rlwrap cat) | ocaml`);
 			}
 			catch (e) {
 				vscode.window.showErrorMessage(e);
