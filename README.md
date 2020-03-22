@@ -26,4 +26,5 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Merlin sometimes marks code as invalid after formatting
+- Merlin sometimes marks code as invalid after formatting
+- Doesn't or not always work on wsl
