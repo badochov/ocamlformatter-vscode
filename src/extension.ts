@@ -1,7 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 
-// todo add suport for own formatting file
 import * as vscode from 'vscode';
 
 const { execSync } = require('child_process');
@@ -18,13 +17,13 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 	const out = { text: "", error: null };
 	try {
 		const sanitizedContent = content.replace(/'/g, "'\\''");
-		let profileString = '';
+		let command = `cd '${dir}' && printf '%s' '${sanitizedContent}' | ocamlformat --name='${fileName}' --enable-outside-detected-project `;
 		if (profiles.includes(profile)) {
 			if (profile !== "own") {
-				profileString = `--profile=${profile}`;
+				command = command.concat(`'--profile=${profile}' `);
 			}
 		}
-		const command = `cd '${dir}' && printf '%s' '${sanitizedContent}' | ocamlformat --name='${fileName}' --enable-outside-detected-project '${profileString}' -`;
+		command = command.concat('-');
 		console.error('%s', command);
 		out.text = execSync(command).toString();
 	}
