@@ -20,7 +20,7 @@ function callOcamlFormatCommand(content: string, fileName: string, dir: string, 
 		let command = `cd '${dir}' && printf '%s' '${sanitizedContent}' | ocamlformat --name='${fileName}' --enable-outside-detected-project `;
 		if (profiles.includes(profile)) {
 			if (profile !== "own") {
-				command = command.concat(`'--profile=${profile}' `);
+				command = command.concat(`--profile='${profile}' `);
 			}
 		}
 		command = command.concat('-');
@@ -172,4 +172,3 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
-
