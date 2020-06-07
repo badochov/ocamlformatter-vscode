@@ -32,4 +32,4 @@ This extension contributes the following settings:
 ## Known Issues
 
 - Merlin sometimes marks code as invalid after formatting
-- Doesn't or not always work on wsl
+- Doesn't or not always work on wsl, possible fix is to set path to `ocamlformat` manualy
