@@ -60,6 +60,7 @@
       "title": "OCaml Formatter",
       "properties": {
         "ocaml-formatter.profile": {
+          "title": "ocamlformat profile",
           "type": "string",
           "default": "conventional",
           "enum": [
@@ -73,15 +74,22 @@
           "description": "Choose formatting profile (own is one defined in .ocamlformat file in project's root directory (see ocamlformat for definition))."
         },
         "ocaml-formatter.ocamlformat-path": {
+          "title": "Path to ocamlformat",
           "type": "string",
           "default": "ocamlformat",
           "description": "Choose path to ocamlformat if it's not installed globally."
+        },
+        "ocaml-formatter.eval-opam-env": {
+          "title": "Eval opam env before every run",
+          "type": "boolean",
+          "default": "false",
+          "description": "Evals opam env at every run if set to true."
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run lint;npm run compile",
+    "vscode:prepublish": "npm run lint && npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",

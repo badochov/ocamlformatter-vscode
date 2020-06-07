@@ -3,7 +3,8 @@
 
 import * as vscode from "vscode";
 
-const { execSync } = require("child_process");
+import { execSync } from "child_process";
+
 const profiles = [
   "conventional",
   "janestreet",
@@ -13,28 +14,39 @@ const profiles = [
   "own",
 ];
 
+interface ocamlformatCallOutput {
+  text: string;
+  error: null | string;
+}
+
 function callOcamlFormatCommand(
   content: string,
   fileName: string,
   dir: string,
-  profile: string
-): { text: string; error: null | string } {
-  const out = { text: "", error: null };
+  profile: string,
+  evalOpam: boolean = false
+): ocamlformatCallOutput {
+  const out: ocamlformatCallOutput = { text: "", error: null };
   try {
     const sanitizedContent = content.replace(/'/g, "'\\''");
 
     const settings = vscode.workspace.getConfiguration("ocaml-formatter");
     const ocamlformatPath = <string>settings.get("ocamlformat-path");
 
-    let command = `cd '${dir}' && printf '%s' '${sanitizedContent}' | ${ocamlformatPath} --name='${fileName}' --enable-outside-detected-project`;
-    if (profiles.includes(profile)) {
-      if (profile !== "own") {
-        command = command.concat(` --profile='${profile}'`);
-      }
+    let command = "";
+    if (evalOpam) {
+      command += "eval $(opam env --readonly) && ";
+    }
+    command += `${ocamlformatPath} --name='${fileName}' --enable-outside-detected-project`;
+    if (profiles.includes(profile) && profile !== "own") {
+      command = command.concat(` --profile='${profile}'`);
     }
     command += " -";
     console.log(command);
-    out.text = execSync(command).toString();
+    out.text = execSync(command, {
+      cwd: dir,
+      input: sanitizedContent,
+    }).toString();
   } catch (error) {
     out.error = error.toString();
     console.error(error);
@@ -184,7 +196,7 @@ export function activate(context: vscode.ExtensionContext) {
         terminal.show();
         // terminal.sendText(`printf "${ocamlScript}"`);
 
-        terminal.sendText(`/bin/bash`);
+        terminal.sendText(`/usr/bin/env bash`);
         terminal.sendText(`(printf '${ocamlScript}'; rlwrap cat) | ocaml`);
       } catch (e) {
         vscode.window.showErrorMessage(e);

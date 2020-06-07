@@ -9,7 +9,7 @@ It's wrapper for ocamlformat.
 ## Features
 
 Formats your ocaml code.
-It formats your code predictably and folowing your favourite rules.
+It formats your code predictably and following your favourite rules.
 You can add your own formatting guidlines by either choosing one of preset profiles or making your own.
 To make your own profile choose profile "own" and add formatting guidelines in `.ocamlformat` file in project's root as defined in ocamlformat docs.
 
@@ -27,9 +27,10 @@ You must have installed:
 This extension contributes the following settings:
 
 - `ocaml-formatter.profile`: choose formatting profile
-- `ocaml-formatter.ocamlformat-path`: choose path to ocamlformat if it's not installed globally, path must be safe to use (eg. no unsanitized spaces)
+- `ocaml-formatter.ocamlformat-path`: choose path to ocamlformat if it's not installed globally, path must be safe to use (eg no unsanitized spaces)
+- `ocaml-formatter.eval-opam-env`: evals opam env at every run if set to true, [useful if use have ocamlformat installed locally](https://github.com/badochov/ocamlformatter-vscode/issues/2#issuecomment-640237333)
 
 ## Known Issues
 
 - Merlin sometimes marks code as invalid after formatting
-- Doesn't or not always work on wsl, possible fix is to set path to `ocamlformat` manualy
+- Doesn't or not always work on WSL, possible fix is to set path to `ocamlformat` manually
