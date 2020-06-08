@@ -31,10 +31,9 @@ function callOcamlFormatCommand(
 
     const settings = vscode.workspace.getConfiguration("ocaml-formatter");
     const ocamlformatPath = <string>settings.get("ocamlformat-path");
-    const evalOpam = settings.get("eval-opam-env");
 
     let command = "";
-    if (evalOpam) {
+    if (settings.get("eval-opam-env")) {
       command += "eval $(opam env --readonly) && ";
     }
     command += `${ocamlformatPath} --name='${fileName}' --enable-outside-detected-project`;
