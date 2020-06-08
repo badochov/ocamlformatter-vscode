@@ -82,7 +82,7 @@
         "ocaml-formatter.eval-opam-env": {
           "title": "Eval opam env before every run",
           "type": "boolean",
-          "default": "false",
+          "default": false,
           "description": "Evals opam env at every run if set to true."
         }
       }

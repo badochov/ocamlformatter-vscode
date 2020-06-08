@@ -23,8 +23,7 @@ function callOcamlFormatCommand(
   content: string,
   fileName: string,
   dir: string,
-  profile: string,
-  evalOpam: boolean = false
+  profile: string
 ): ocamlformatCallOutput {
   const out: ocamlformatCallOutput = { text: "", error: null };
   try {
@@ -32,6 +31,7 @@ function callOcamlFormatCommand(
 
     const settings = vscode.workspace.getConfiguration("ocaml-formatter");
     const ocamlformatPath = <string>settings.get("ocamlformat-path");
+    const evalOpam = settings.get("eval-opam-env");
 
     let command = "";
     if (evalOpam) {
