@@ -27,8 +27,6 @@ function callOcamlFormatCommand(
 ): ocamlformatCallOutput {
   const out: ocamlformatCallOutput = { text: "", error: null };
   try {
-    const sanitizedContent = content.replace(/'/g, "'\\''");
-
     const settings = vscode.workspace.getConfiguration("ocaml-formatter");
     const ocamlformatPath = <string>settings.get("ocamlformat-path");
 
@@ -44,7 +42,7 @@ function callOcamlFormatCommand(
     console.log(command);
     out.text = execSync(command, {
       cwd: dir,
-      input: sanitizedContent,
+      input: content,
     }).toString();
   } catch (error) {
     out.error = error.toString();
