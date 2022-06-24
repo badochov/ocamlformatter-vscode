@@ -66,8 +66,6 @@
           "enum": [
             "conventional",
             "janestreet",
-            "sparse",
-            "compact",
             "ocamlformat",
             "own"
           ],
