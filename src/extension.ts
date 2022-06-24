@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 import { execSync } from "child_process";
 import { dirname, basename } from "path";
+import { match, P } from "ts-pattern";
 
 const profiles = ["conventional", "janestreet", "ocamlformat", "own"];
 
@@ -52,13 +53,7 @@ function getTextForExecution(
   content: string,
   fileName: string = "ocaml-code.ml"
 ) {
-  const formattedText = getFormattedText(content, fileName);
-  const noCommentsText = formattedText.replace(/\(\*(.|\n|\r)*?\*\)/g, "");
-  const preparedText = noCommentsText.replace(/\nlet/g, ";;\nlet");
-  const sanitizedText = preparedText.replace(/\"/g, '\\"');
-  const escapePercentageSign = sanitizedText.replace(/%/g, "%%");
-
-  return escapePercentageSign;
+  return getFormattedText(content, fileName);
 }
 
 function getFormattedText(content: string, fileName: string): string {
@@ -78,6 +73,50 @@ function getFormattedText(content: string, fileName: string): string {
   }
   output.push(";;");
   return output.join("");
+}
+
+function removeComments(formattedText: string): string {
+  let commentsCounter = 0;
+  const parts: string[] = [];
+  const tokens = tokenify(formattedText);
+  console.log(tokens);
+  for (const token of tokens) {
+    match(token)
+      .with({ type: "comOpen" }, () => {
+        ++commentsCounter;
+      })
+      .with({ type: "comClose" }, () => {
+        --commentsCounter;
+      })
+      .with({ type: "code", code: P.select() }, (code) => {
+        if (commentsCounter === 0) {
+          parts.push(code);
+        }
+      })
+      .exhaustive();
+  }
+  return parts.join("");
+}
+
+type Token =
+  | { type: "comOpen" }
+  | { type: "comClose" }
+  | { type: "code"; code: string };
+
+function tokenify(text: string): Token[] {
+  const comOpen = text.split(/\(\*/g);
+  const tokens: Token[] = [];
+  for (const el of comOpen) {
+    const comClose = el.split(/\*\)/g);
+    for (const code of comClose) {
+      tokens.push({ type: "code", code });
+      tokens.push({ type: "comClose" });
+    }
+    tokens.pop();
+    tokens.push({ type: "comOpen" });
+  }
+  tokens.pop();
+  return tokens;
 }
 
 // this method is called when your extension is activated
@@ -155,11 +194,8 @@ async function runCodeFragment(editor: vscode.TextEditor) {
   const selectedText = editor.document.getText(selection);
   try {
     const ocamlScript = getTextForExecution(selectedText);
-
     const terminal = vscode.window.createTerminal("OCaml");
-    terminal.sendText(`/usr/bin/env bash`);
     terminal.sendText(`ocaml`);
-
     await delay(getDelay());
     terminal.sendText(ocamlScript);
     terminal.show();

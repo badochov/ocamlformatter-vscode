@@ -35,7 +35,7 @@
     "commands": [
       {
         "command": "ocaml-formatter.runCodeFragment",
-        "title": "Run code fragment in interactive console"
+        "title": "Run code fragment in REPL"
       }
     ],
     "menus": {
@@ -105,16 +105,19 @@
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "~1.43.0",
-    "glob": "^8.0.3",
-    "mocha": "^10.0.0",
-    "typescript": "^4.7.4",
-    "vscode-test": "^1.4.0",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "eslint": "^8.18.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.7.1"
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4",
+    "vscode-test": "^1.4.0"
+  },
+  "dependencies": {
+    "ts-pattern": "^4.0.3"
   }
 }
