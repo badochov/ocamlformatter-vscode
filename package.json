@@ -77,6 +77,12 @@
           "default": "ocamlformat",
           "description": "Choose path to ocamlformat if it's not installed globally."
         },
+        "ocaml-formatter.ocaml-repl-startup-delay": {
+          "title": "OCaml REPL startup delay",
+          "type": "number",
+          "default": 500,
+          "description": "Specifies how long should the extension wait between starting REPL and executing program"
+        },
         "ocaml-formatter.eval-opam-env": {
           "title": "Eval opam env before every run",
           "type": "boolean",

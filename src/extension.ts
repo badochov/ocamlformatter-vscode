@@ -24,11 +24,10 @@ function callOcamlFormatCommand(
 }
 
 function buildCommand(fileName: string, profile: string): string {
-  const settings = vscode.workspace.getConfiguration("ocaml-formatter");
-  const ocamlformatPath = <string>settings.get("ocamlformat-path");
+  const ocamlformatPath: string = getValueFromConfig("ocamlformat-path");
 
   const command: string[] = [];
-  if (settings.get("eval-opam-env")) {
+  if (getValueFromConfig<boolean>("eval-opam-env")) {
     command.push("eval $(opam env --readonly)", "&&");
   }
   command.push(
@@ -86,16 +85,19 @@ function getFormattedText(content: string, fileName: string): string {
 export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  vscode.languages.registerDocumentFormattingEditProvider(
-    { scheme: "file", language: "ocaml" },
-    {
-      provideDocumentFormattingEdits,
-    }
+  context.subscriptions.push(
+    vscode.languages.registerDocumentFormattingEditProvider(
+      { scheme: "file", language: "ocaml" },
+      {
+        provideDocumentFormattingEdits,
+      }
+    )
   );
-
-  vscode.commands.registerCommand(
-    "ocaml-formatter.runCodeFragment",
-    runCodeFragment
+  context.subscriptions.push(
+    vscode.commands.registerTextEditorCommand(
+      "ocaml-formatter.runCodeFragment",
+      runCodeFragment
+    )
   );
 }
 
@@ -103,10 +105,7 @@ function provideDocumentFormattingEdits(
   document: vscode.TextDocument
 ): vscode.TextEdit[] {
   const filePath = document.uri.fsPath;
-
-  const settings = vscode.workspace.getConfiguration("ocaml-formatter");
-  const profile = <string>settings.get("profile");
-
+  const profile: string = getValueFromConfig("profile");
   const fullText = document.getText();
 
   try {
@@ -135,25 +134,35 @@ function errorHandler(
   return [vscode.TextEdit.insert(document.positionAt(0), "")];
 }
 
-function runCodeFragment() {
-  // The code you place here will be executed every time your command is executed
-  const editor = vscode.window.activeTextEditor;
-  if (editor === undefined) {
-    vscode.window.showErrorMessage("Editor is undefined");
-    return;
-  }
+function delay(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
-  // Display a message box to the user
+function getConfig(): vscode.WorkspaceConfiguration {
+  return vscode.workspace.getConfiguration("ocaml-formatter");
+}
+
+function getValueFromConfig<T>(name: string): T {
+  return <T>getConfig().get(name);
+}
+
+function getDelay(): number {
+  return getValueFromConfig("ocaml-repl-startup-delay");
+}
+
+async function runCodeFragment(editor: vscode.TextEditor) {
   const selection = editor.selection;
   const selectedText = editor.document.getText(selection);
   try {
     const ocamlScript = getTextForExecution(selectedText);
 
     const terminal = vscode.window.createTerminal("OCaml");
-    terminal.show();
-
     terminal.sendText(`/usr/bin/env bash`);
-    terminal.sendText(`(printf '${ocamlScript}'; rlwrap cat) | ocaml`);
+    terminal.sendText(`ocaml`);
+
+    await delay(getDelay());
+    terminal.sendText(ocamlScript);
+    terminal.show();
   } catch (e) {
     if (e instanceof Error) {
       vscode.window.showErrorMessage(e.toString());
