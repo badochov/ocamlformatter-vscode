@@ -8,8 +8,6 @@ import { execSync } from "child_process";
 const profiles = [
   "conventional",
   "janestreet",
-  "sparse",
-  "compact",
   "ocamlformat",
   "own",
 ];
