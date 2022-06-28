@@ -19,6 +19,8 @@ You can select fragment of code and run it in the ocaml interactive terminal in 
 
 You must have installed:
 - [ocamlformat](https://github.com/ocaml-ppx/ocamlformat) installed preferably globally otherwise set path to it in `ocamlformat-path` setting
+- `OCaml` - for running code in REPL
+
 
 ## Extension Settings
 
