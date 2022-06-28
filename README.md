@@ -4,7 +4,7 @@ Extension to format ocaml code and run it in interactive terminal.
 
 This extension doesn't provide ocaml support in vscode, install one of available extensions for that.
 
-It's wrapper for ocamlformat.
+It's wrapper for `ocamlformat`.
 
 ## Features
 
@@ -18,8 +18,6 @@ You can select fragment of code and run it in the ocaml interactive terminal in 
 ## Requirements
 
 You must have installed:
-
-- OCaml
 - [ocamlformat](https://github.com/ocaml-ppx/ocamlformat) installed preferably globally otherwise set path to it in `ocamlformat-path` setting
 
 ## Extension Settings
