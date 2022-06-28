@@ -2,7 +2,7 @@
   "name": "ocaml-formatter",
   "displayName": "OCaml Formatter",
   "description": "Formatter for OCaml language",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "MIT",
   "publisher": "badochov",
   "icon": "assets/logo.png",

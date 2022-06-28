@@ -29,8 +29,8 @@ This extension contributes the following settings:
 - `ocaml-formatter.profile`: choose formatting profile
 - `ocaml-formatter.ocamlformat-path`: choose path to ocamlformat if it's not installed globally, path must be safe to use (eg no unsanitized spaces)
 - `ocaml-formatter.eval-opam-env`: evals opam env at every run if set to true, [useful if use have ocamlformat installed locally](https://github.com/badochov/ocamlformatter-vscode/issues/2#issuecomment-640237333)
+- `ocaml-formatter.ocamlformat-path`: specifies how long should the extension wait between starting REPL and executing program
 
 ## Known Issues
 
-- Merlin sometimes marks code as invalid after formatting
 - Doesn't or not always work on WSL, possible fix is to set path to `ocamlformat` manually
