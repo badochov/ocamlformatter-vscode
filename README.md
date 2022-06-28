@@ -33,4 +33,5 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-- Doesn't or not always work on WSL, possible fix is to set path to `ocamlformat` manually
+- Merlin sometimes marks code as invalid after formatting
+
