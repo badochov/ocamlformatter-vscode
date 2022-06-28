@@ -48,10 +48,7 @@ function formatOcamlFormatterError(error: Error) {
     .replace(/(\n|\r|.)*--enable-outside-detected-project .*? -/g, "");
 }
 
-function getTextForExecution(
-  content: string,
-  fileName: string = "ocaml-code.ml"
-) {
+function getTextForExecution(content: string, fileName: string) {
   return getFormattedText(content, fileName);
 }
 
@@ -148,7 +145,8 @@ async function runCodeFragment(editor: vscode.TextEditor) {
   const selection = editor.selection;
   const selectedText = editor.document.getText(selection);
   try {
-    const ocamlScript = getTextForExecution(selectedText);
+    const fileName = editor.document.fileName;
+    const ocamlScript = getTextForExecution(selectedText, fileName);
     const terminal = vscode.window.createTerminal("OCaml");
     terminal.sendText(`ocaml`);
     await delay(getDelay());
